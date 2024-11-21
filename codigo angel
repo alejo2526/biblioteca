@@ -1,0 +1,73 @@
+class Libro:
+    def __init__(self, titulo, autor):
+        self.titulo = titulo
+        self.autor = autor
+        self.disponible = True
+
+    def mostrar_detalles(self):
+        return f"Título: {self.titulo}, Autor: {self.autor}, Disponible: {'Sí' if self.disponible else 'No'}"
+
+class Usuario:
+    def __init__(self, nombre):
+        self.nombre = nombre
+        self.libros_prestados = []
+
+    def prestar_libro(self, libro, biblioteca):
+        try:
+            biblioteca.prestar_libro(libro, self)
+            self.libros_prestados.append(libro)
+            print(f"Libro '{libro.titulo}' prestado a {self.nombre}")
+        except Exception as e:
+            print(f"Error: {str(e)}")
+
+class Biblioteca:
+    def __init__(self):
+        self.libros = []
+
+    def agregar_libro(self, libro):
+        self.libros.append(libro)
+
+    def prestar_libro(self, libro, usuario):
+        if libro not in self.libros:
+            raise Exception("El libro no pertenece a esta biblioteca")
+        if not libro.disponible:
+            raise Exception("El libro no está disponible")
+        libro.disponible = False
+
+    def devolver_libro(self, libro, usuario):
+        if libro in usuario.libros_prestados:
+            libro.disponible = True
+            usuario.libros_prestados.remove(libro)
+            print(f"Libro '{libro.titulo}' devuelto por {usuario.nombre}")
+        else:
+            raise Exception("El usuario no tiene este libro prestado")
+
+# Ejemplo de uso
+biblioteca = Biblioteca()
+libro1 = Libro("el señor de los anillos", "J. R. R. Tolkien")
+libro2 = Libro("Un mundo feliz", "Aldous Huxley")
+
+biblioteca.agregar_libro(libro1)
+biblioteca.agregar_libro(libro2)
+
+usuario1 = Usuario("Juan")
+usuario2 = Usuario("María")
+
+print("\nDetalles iniciales de los libros:")
+print(libro1.mostrar_detalles())
+print(libro2.mostrar_detalles())
+
+print("\nRealizando préstamos:")
+usuario1.prestar_libro(libro1, biblioteca)
+# Intentar prestar un libro ya prestado
+usuario2.prestar_libro(libro1, biblioteca)
+
+print("\nDetalles después de los préstamos:")
+print(libro1.mostrar_detalles())
+print(libro2.mostrar_detalles())
+
+print("\nDevolviendo libro:")
+biblioteca.devolver_libro(libro1, usuario1)
+
+print("\nDetalles finales:")
+print(libro1.mostrar_detalles())
