@@ -1,0 +1,74 @@
+class Libro:
+    def __init__(self, titulo, autor):
+        self.titulo = titulo
+        self.autor = autor
+        self.disponible = True
+
+    def mostrar_detalles(self):
+        return f"Título: {self.titulo}, Autor: {self.autor}, Disponible: {'Sí' if self.disponible else 'No'}"
+
+class Usuario:
+    def __init__(self, nombre):
+        self.nombre = nombre
+        self.libros_prestados = []
+
+    def prestar_libro(self, libro):
+        if not libro.disponible:
+            raise Exception(f"El libro '{libro.titulo}' no está disponible")
+        libro.disponible = False
+        self.libros_prestados.append(libro)
+        return f"Libro '{libro.titulo}' prestado a {self.nombre}"
+
+    def devolver_libro(self, libro):
+        if libro in self.libros_prestados:
+            libro.disponible = True
+            self.libros_prestados.remove(libro)
+            return f"Libro '{libro.titulo}' devuelto por {self.nombre}"
+        raise Exception("Este libro no fue prestado a este usuario")
+
+class Biblioteca:
+    def __init__(self):
+        self.libros = [
+            Libro("Orgullo y prejuicio", "Jane Austen"),
+            Libro("Crimen y castigo", "Fiódor Dostoyevski"),
+            Libro("En busca del tiempo perdido", "Marcel Proust"),
+            Libro("Ulises", "James Joyce")
+        ]
+
+    def prestar_libro(self, titulo, usuario):
+        for libro in self.libros:
+            if libro.titulo == titulo:
+                return usuario.prestar_libro(libro)
+        raise Exception("Libro no encontrado en la biblioteca")
+
+    def devolver_libro(self, titulo, usuario):
+        for libro in self.libros:
+            if libro.titulo == titulo:
+                return usuario.devolver_libro(libro)
+        raise Exception("Libro no encontrado en la biblioteca")
+
+# Prueba del sistema
+biblioteca = Biblioteca()
+usuario = Usuario("Juan")
+
+# Mostrar detalles de todos los libros
+print("=== Catálogo de la biblioteca ===")
+for libro in biblioteca.libros:
+    print(libro.mostrar_detalles())
+
+# Realizar algunas operaciones
+try:
+    print("\n=== Realizando operaciones ===")
+    print(biblioteca.prestar_libro("Orgullo y prejuicio", usuario))
+    print(biblioteca.prestar_libro("Ulises", usuario))
+    print(biblioteca.devolver_libro("Orgullo y prejuicio", usuario))
+    
+    # Intentar prestar un libro ya prestado
+    print(biblioteca.prestar_libro("Ulises", usuario))
+except Exception as e:
+    print(f"Error: {e}")
+
+# Mostrar estado final
+print("\n=== Estado final de los libros ===")
+for libro in biblioteca.libros:
+    print(libro.mostrar_detalles())
